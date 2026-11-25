@@ -71,7 +71,7 @@ class AdminLoginRequest extends FormRequest
 
         $admin = Auth::guard('admin')->user();
 
-        if (! $admin || $admin->status !== 'Active') {
+        if (! $admin || strtolower((string) $admin->status) !== 'active') {
             Auth::guard('admin')->logout();
 
             throw ValidationException::withMessages([
