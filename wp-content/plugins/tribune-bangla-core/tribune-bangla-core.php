@@ -319,3 +319,59 @@ function tb_core_register_editorial_roles() {
 }
 add_action('init','tb_core_register_editorial_roles');
 
+
+
+/* প্রতিটি সংবাদ ও পাতার SEO তথ্য */
+function tb_core_seo_box() {
+    foreach (['post','page'] as $screen) add_meta_box('tb-seo-fields','SEO সেটিংস','tb_core_seo_box_html',$screen,'normal','low');
+}
+add_action('add_meta_boxes','tb_core_seo_box');
+function tb_core_seo_box_html($post) {
+    wp_nonce_field('tb_core_seo_save','tb_core_seo_nonce');
+    $description=get_post_meta($post->ID,'_tb_seo_description',true);
+    $canonical=get_post_meta($post->ID,'_tb_seo_canonical',true);
+    $noindex=get_post_meta($post->ID,'_tb_seo_noindex',true);
+    echo '<p><label><strong>মেটা বিবরণ (সর্বোচ্চ ১৬০ অক্ষর)</strong><br><textarea class="widefat" rows="3" maxlength="160" name="tb_seo_description">'.esc_textarea($description).'</textarea></label></p>';
+    echo '<p><label><strong>ক্যানোনিক্যাল URL (ঐচ্ছিক)</strong><br><input class="widefat" type="url" name="tb_seo_canonical" value="'.esc_attr($canonical).'"></label></p>';
+    echo '<p><label><input type="checkbox" name="tb_seo_noindex" value="1" '.checked($noindex,'1',false).'> সার্চ ইঞ্জিনে এই পেজ ইনডেক্স করবেন না</label></p>';
+}
+function tb_core_save_seo($post_id) {
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (wp_is_post_revision($post_id) || !isset($_POST['tb_core_seo_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['tb_core_seo_nonce'])),'tb_core_seo_save')) return;
+    if (!current_user_can('edit_post',$post_id)) return;
+    $description=isset($_POST['tb_seo_description']) ? sanitize_textarea_field(wp_unslash($_POST['tb_seo_description'])) : '';
+    $canonical=isset($_POST['tb_seo_canonical']) ? esc_url_raw(wp_unslash($_POST['tb_seo_canonical'])) : '';
+    if ($description) update_post_meta($post_id,'_tb_seo_description',mb_substr($description,0,160)); else delete_post_meta($post_id,'_tb_seo_description');
+    if ($canonical) update_post_meta($post_id,'_tb_seo_canonical',$canonical); else delete_post_meta($post_id,'_tb_seo_canonical');
+    if (isset($_POST['tb_seo_noindex'])) update_post_meta($post_id,'_tb_seo_noindex','1'); else delete_post_meta($post_id,'_tb_seo_noindex');
+}
+add_action('save_post_post','tb_core_save_seo');
+add_action('save_post_page','tb_core_save_seo');
+function tb_core_output_seo() {
+    if (!is_singular()) return;
+    $id=get_queried_object_id();
+    if (!$id) return;
+    $description=get_post_meta($id,'_tb_seo_description',true);
+    $canonical=get_post_meta($id,'_tb_seo_canonical',true);
+    $noindex=get_post_meta($id,'_tb_seo_noindex',true);
+    if ($description) echo '<meta name="description" content="'.esc_attr($description).'">'.PHP_EOL;
+    if ($canonical) echo '<link rel="canonical" href="'.esc_url($canonical).'">'.PHP_EOL;
+    if ($noindex==='1') echo '<meta name="robots" content="noindex,follow">'.PHP_EOL;
+    if (has_post_thumbnail($id)) {
+        $image=get_the_post_thumbnail_url($id,'large');
+        if ($image) echo '<meta property="og:image" content="'.esc_url($image).'">'.PHP_EOL;
+    }
+    echo '<meta property="og:title" content="'.esc_attr(get_the_title($id)).'">'.PHP_EOL;
+    if ($description) echo '<meta property="og:description" content="'.esc_attr($description).'">'.PHP_EOL;
+    echo '<meta property="og:type" content="article">'.PHP_EOL;
+}
+add_action('wp_head','tb_core_output_seo',2);
+
+/* সম্পাদকীয় ভূমিকার ক্ষমতা স্পষ্টভাবে নির্ধারণ */
+function tb_core_sync_role_caps() {
+    $reporter=get_role('tb_reporter');
+    if ($reporter) { $reporter->add_cap('read'); $reporter->add_cap('edit_posts'); $reporter->add_cap('upload_files'); }
+    $sub=get_role('tb_sub_editor');
+    if ($sub) foreach (['read','edit_posts','edit_others_posts','edit_published_posts','publish_posts','upload_files','moderate_comments'] as $cap) $sub->add_cap($cap);
+}
+add_action('init','tb_core_sync_role_caps',20);
