@@ -1,0 +1,1 @@
+<?php get_header(); ?><main class="tb-wrap tb-section"><h1>দুঃখিত, পৃষ্ঠাটি পাওয়া যায়নি</h1><p>আপনি যে সংবাদ বা পৃষ্ঠাটি খুঁজছেন, সেটি সরানো হয়েছে অথবা ঠিকানা পরিবর্তন হয়েছে।</p><?php get_search_form(); ?><p><a href="<?php echo esc_url(home_url('/')); ?>">প্রচ্ছদে ফিরে যান</a></p></main><?php get_footer(); ?>
