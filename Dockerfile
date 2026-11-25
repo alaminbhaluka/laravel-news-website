@@ -8,13 +8,12 @@ COPY public ./public
 COPY vite.config.js postcss.config.js tailwind.config.js ./
 RUN npm run build
 
-FROM php:8.2-cli-bookworm AS app
+FROM debian:bookworm-slim AS app
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
-    libicu-dev libonig-dev libcurl4-openssl-dev unzip git ca-certificates \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" pdo_pgsql pgsql bcmath gd intl zip exif mbstring curl pcntl opcache \
+    ca-certificates unzip git \
+    php8.2-cli php8.2-common php8.2-pgsql php8.2-bcmath php8.2-gd \
+    php8.2-intl php8.2-zip php8.2-mbstring php8.2-curl php8.2-opcache php8.2-xml \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
