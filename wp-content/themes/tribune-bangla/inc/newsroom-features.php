@@ -103,7 +103,7 @@ add_shortcode('tribune_newsletter', function () {
                 $exists = get_posts(['post_type'=>'tb_subscriber','post_status'=>'private','numberposts'=>1,'meta_key'=>'_tb_subscriber_email','meta_value'=>$email]);
                 if (!$exists) {
                     $id = wp_insert_post(['post_type'=>'tb_subscriber','post_status'=>'private','post_title'=>$email]);
-                    if (!is_wp_error($id)) update_post_meta($id, '_tb_subscriber_email', $email);
+                    if (!is_wp_error($id)) { update_post_meta($id, '_tb_subscriber_email', $email); do_action('save_post_tb_subscriber', $id, get_post($id), true); }
                 }
                 $message = 'নিউজলেটার তালিকায় আপনার ইমেইল যুক্ত হয়েছে।';
             }
