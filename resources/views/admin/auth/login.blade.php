@@ -1,6 +1,6 @@
 @extends('admin.layouts.auth_master')
 
-@section('title', 'Login')
+@section('title', 'অ্যাডমিন লগইন')
 
 @section('content')
 <!-- Login -->
@@ -62,8 +62,8 @@
             </a>
         </div>
         <!-- /Logo -->
-        <h4 class="mb-2">Welcome to {{ env('APP_NAME') }}! 👋</h4>
-        <p class="mb-4">Please sign-in to your account and start the adventure</p>
+        <h4 class="mb-2">স্বাগতম {{ env('APP_NAME') }}! 👋</h4>
+        <p class="mb-4">অ্যাডমিন অ্যাকাউন্টে প্রবেশ করুন</p>
 
         <!-- Session -->
         @if (session('status'))
@@ -76,17 +76,17 @@
         <form id="formAuthentication" class="mb-3" action="{{ route('admin.login') }}" method="POST">
             @csrf
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="text" class="form-control" id="email" name="email" value="{{ old('email') }}" placeholder="Enter your email"/>
-                @error('email')
+                <label for="login" class="form-label">মোবাইল নম্বর অথবা ইমেইল</label>
+                <input type="text" class="form-control" id="login" name="login" value="{{ old('login') }}" placeholder="মোবাইল নম্বর / ইমেইল লিখুন" autocomplete="username" required/>
+                @error('login')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
             <div class="mb-3 form-password-toggle">
                 <div class="d-flex justify-content-between">
-                    <label class="form-label" for="password">Password</label>
+                    <label class="form-label" for="password">পাসওয়ার্ড</label>
                     <a href="{{ route('admin.password.request') }}">
-                        <small>Forgot Password?</small>
+                        <small>পাসওয়ার্ড ভুলে গেছেন?</small>
                     </a>
                 </div>
                 <div class="input-group input-group-merge">
@@ -100,66 +100,16 @@
             <div class="mb-3">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="remember" name="remember" />
-                <label class="form-check-label" for="remember"> Remember Me </label>
+                <label class="form-check-label" for="remember"> আমাকে মনে রাখুন </label>
             </div>
             </div>
             <div class="mb-3">
-            <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+            <button class="btn btn-primary d-grid w-100" type="submit">লগইন করুন</button>
             </div>
         </form>
-
-         <div class="demo mt-2">
-            <h5 class="text-center">Demo User Details</h5>
-            <div class="table-responsive">
-                <table class="table table-primary">
-                    <thead>
-                        <tr>
-                            <th>Email</th>
-                            <th>Password</th>
-                            <th>Role</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>superadmin@email.com</td>
-                            <td>12345678</td>
-                            <td>Super Admin</td>
-                            <td><button class="btn btn-primary btn-sm" onclick="copyUserDetails('superadmin@email.com', '12345678')">Copy</button></td>
-                        </tr>
-                        <tr>
-                            <td>admin@email.com</td>
-                            <td>12345678</td>
-                            <td>Admin</td>
-                            <td><button class="btn btn-primary btn-sm" onclick="copyUserDetails('admin@email.com', '12345678')">Copy</button></td>
-                        </tr>
-                        <tr>
-                            <td>manager@email.com</td>
-                            <td>12345678</td>
-                            <td>Manager</td>
-                            <td><button class="btn btn-primary btn-sm" onclick="copyUserDetails('manager@email.com', '12345678')">Copy</button></td>
-                        </tr>
-                        <tr>
-                            <td>reporter@email.com</td>
-                            <td>12345678</td>
-                            <td>Reporter</td>
-                            <td><button class="btn btn-primary btn-sm" onclick="copyUserDetails('reporter@email.com', '12345678')">Copy</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
     </div>
 </div>
 <!-- /Login -->
 @endsection
 
-@section('script')
-<script>
-    function copyUserDetails(email, password) {
-        document.getElementById('email').value = email;
-        document.getElementById('password').value = password;
-    }
-</script>
-@endsection
