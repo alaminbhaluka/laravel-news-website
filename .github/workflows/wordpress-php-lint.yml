@@ -1,0 +1,28 @@
+name: WordPress PHP syntax check
+
+on:
+  push:
+    branches:
+      - wordpress-theme-foundation
+    paths:
+      - 'wp-content/themes/tribune-bangla/**'
+      - 'wp-content/plugins/tribune-bangla-core/**'
+      - '.github/workflows/wordpress-php-lint.yml'
+  pull_request:
+    paths:
+      - 'wp-content/themes/tribune-bangla/**'
+      - 'wp-content/plugins/tribune-bangla-core/**'
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathai/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Check PHP syntax
+        run: |
+          find wp-content/themes/tribune-bangla wp-content/plugins/tribune-bangla-core -type f -name '*.php' -print0 | xargs -0 -n1 php -l
