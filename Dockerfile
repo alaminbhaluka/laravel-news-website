@@ -26,5 +26,5 @@ RUN php artisan package:discover --ansi \
     && chown -R www-data:www-data storage bootstrap/cache
 USER www-data
 ENV APP_ENV=production APP_DEBUG=false
-EXPOSE 3000
+EXPOSE 80
 CMD ["sh", "/var/www/html/docker/vercel-entrypoint.sh"]
