@@ -1,0 +1,1 @@
+<article <?php post_class('tb-card'); ?>><a href="<?php the_permalink(); ?>"><div class="tb-thumb"><?php if(has_post_thumbnail())the_post_thumbnail('medium_large'); ?></div><?php tribune_bangla_category_label(); ?><h3><?php the_title(); ?></h3></a><?php tribune_bangla_post_meta(); ?></article>
