@@ -32,7 +32,7 @@ jobs:
           cd wp-content/themes
           zip -qr ../../dist/tribune-bangla-theme.zip tribune-bangla
           cd ../plugins
-          zip -qr ../../../dist/tribune-bangla-core-plugin.zip tribune-bangla-core
+          zip -qr ../../dist/tribune-bangla-core-plugin.zip tribune-bangla-core
           cd ../../
           sha256sum dist/*.zip > dist/SHA256SUMS.txt
 
