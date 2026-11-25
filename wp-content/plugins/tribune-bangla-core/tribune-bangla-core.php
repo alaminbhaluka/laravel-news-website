@@ -205,3 +205,117 @@ final class Tribune_Bangla_Core {
     }
 }
 new Tribune_Bangla_Core();
+
+
+/* বিজ্ঞাপন ও গ্যালারির জন্য সম্পাদকীয় মেটাডেটা */
+function tb_core_add_meta_boxes() {
+    add_meta_box('tb-ad-details', 'বিজ্ঞাপনের প্রদর্শন সেটিংস', 'tb_core_ad_box', 'tb_advertisement', 'normal', 'high');
+    add_meta_box('tb-gallery-details', 'গ্যালারি সেটিংস', 'tb_core_gallery_box', 'tb_gallery', 'normal', 'high');
+}
+add_action('add_meta_boxes', 'tb_core_add_meta_boxes');
+
+function tb_core_ad_box($post) {
+    wp_nonce_field('tb_core_save_meta', 'tb_core_meta_nonce');
+    $fields = [
+        'tb_ad_position' => ['label'=>'অবস্থান', 'type'=>'select', 'options'=>['header'=>'হেডার','homepage'=>'হোমপেজ','sidebar'=>'সাইডবার','article'=>'সংবাদের ভেতরে','footer'=>'ফুটার']],
+        'tb_ad_url' => ['label'=>'বিজ্ঞাপনে ক্লিকের লিংক', 'type'=>'url'],
+        'tb_ad_start' => ['label'=>'শুরুর তারিখ', 'type'=>'date'],
+        'tb_ad_end' => ['label'=>'শেষের তারিখ', 'type'=>'date'],
+    ];
+    foreach ($fields as $key=>$field) {
+        $value = get_post_meta($post->ID, $key, true);
+        echo '<p><label><strong>'.esc_html($field['label']).'</strong><br>';
+        if ($field['type']==='select') {
+            echo '<select name="'.esc_attr($key).'">';
+            foreach ($field['options'] as $v=>$label) echo '<option value="'.esc_attr($v).'" '.selected($value,$v,false).'>'.esc_html($label).'</option>';
+            echo '</select>';
+        } else {
+            echo '<input class="regular-text" type="'.esc_attr($field['type']).'" name="'.esc_attr($key).'" value="'.esc_attr($value).'">';
+        }
+        echo '</label></p>';
+    }
+    echo '<p>বিজ্ঞাপনের ছবি ফিচার্ড ইমেজ হিসেবে দিন। চাইলে সম্পাদনা অংশে বিজ্ঞাপনের HTML/লেখাও যোগ করতে পারবেন।</p>';
+}
+function tb_core_gallery_box($post) {
+    wp_nonce_field('tb_core_save_meta', 'tb_core_meta_nonce');
+    $video = get_post_meta($post->ID, 'tb_gallery_video_url', true);
+    echo '<p><label><strong>ভিডিও URL (ঐচ্ছিক)</strong><br><input class="large-text" type="url" name="tb_gallery_video_url" value="'.esc_attr($video).'" placeholder="https://..."></label></p>';
+    echo '<p>একাধিক ছবি যোগ করতে মূল সম্পাদনা অংশে গ্যালারির ছবি যুক্ত করুন অথবা ফিচার্ড ইমেজ নির্বাচন করুন।</p>';
+}
+function tb_core_save_editorial_meta($post_id) {
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (wp_is_post_revision($post_id) || !isset($_POST['tb_core_meta_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['tb_core_meta_nonce'])), 'tb_core_save_meta')) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    if (get_post_type($post_id)==='tb_advertisement') {
+        $position = isset($_POST['tb_ad_position']) ? sanitize_key(wp_unslash($_POST['tb_ad_position'])) : 'homepage';
+        $allowed = ['header','homepage','sidebar','article','footer'];
+        if (in_array($position,$allowed,true)) update_post_meta($post_id,'tb_ad_position',$position);
+        foreach (['tb_ad_url'=>'esc_url_raw','tb_ad_start'=>'sanitize_text_field','tb_ad_end'=>'sanitize_text_field'] as $key=>$sanitize) {
+            if (isset($_POST[$key])) update_post_meta($post_id,$key,call_user_func($sanitize,wp_unslash($_POST[$key])));
+        }
+    }
+    if (get_post_type($post_id)==='tb_gallery' && isset($_POST['tb_gallery_video_url'])) {
+        update_post_meta($post_id,'tb_gallery_video_url',esc_url_raw(wp_unslash($_POST['tb_gallery_video_url'])));
+    }
+}
+add_action('save_post_tb_advertisement','tb_core_save_editorial_meta');
+add_action('save_post_tb_gallery','tb_core_save_editorial_meta');
+
+/* নির্ধারিত স্থান ও সময় অনুযায়ী সক্রিয় বিজ্ঞাপন */
+function tb_core_ads_shortcode($atts) {
+    $atts = shortcode_atts(['position'=>'homepage','limit'=>3],$atts,'tribune_ads');
+    $position = sanitize_key($atts['position']);
+    if (!in_array($position,['header','homepage','sidebar','article','footer'],true)) return '';
+    $today = current_time('Y-m-d');
+    $query = new WP_Query(['post_type'=>'tb_advertisement','post_status'=>'publish','posts_per_page'=>max(1,min(10,(int)$atts['limit'])),'meta_key'=>'tb_ad_position','meta_value'=>$position,'orderby'=>'menu_order date','order'=>'ASC']);
+    if (!$query->have_posts()) return '';
+    ob_start();
+    echo '<div class="tb-advertisements tb-ad-'.esc_attr($position).'">';
+    while ($query->have_posts()) {
+        $query->the_post();
+        $start=get_post_meta(get_the_ID(),'tb_ad_start',true);
+        $end=get_post_meta(get_the_ID(),'tb_ad_end',true);
+        if (($start && $start>$today) || ($end && $end<$today)) continue;
+        $url=get_post_meta(get_the_ID(),'tb_ad_url',true);
+        echo '<div class="tb-ad-item">';
+        if ($url) echo '<a href="'.esc_url($url).'" target="_blank" rel="sponsored noopener">';
+        if (has_post_thumbnail()) the_post_thumbnail('large');
+        if (trim(get_the_content())) echo '<div class="tb-ad-copy">'.wp_kses_post(apply_filters('the_content',get_the_content())).'</div>';
+        if ($url) echo '</a>';
+        echo '</div>';
+    }
+    echo '</div>';
+    wp_reset_postdata();
+    return ob_get_clean();
+}
+add_shortcode('tribune_ads','tb_core_ads_shortcode');
+
+/* গ্যালারি তালিকা */
+function tb_core_gallery_shortcode($atts) {
+    $atts=shortcode_atts(['limit'=>12],$atts,'tribune_gallery');
+    $q=new WP_Query(['post_type'=>'tb_gallery','post_status'=>'publish','posts_per_page'=>max(1,min(40,(int)$atts['limit']))]);
+    if (!$q->have_posts()) return '<p>এখনো কোনো গ্যালারি প্রকাশ করা হয়নি।</p>';
+    ob_start();
+    echo '<div class="tb-gallery-grid">';
+    while($q->have_posts()) {
+        $q->the_post();
+        echo '<article class="tb-gallery-card"><a href="'.esc_url(get_permalink()).'">';
+        if(has_post_thumbnail()) the_post_thumbnail('medium_large');
+        echo '<h3>'.esc_html(get_the_title()).'</h3></a>';
+        $video=get_post_meta(get_the_ID(),'tb_gallery_video_url',true);
+        if($video) echo '<p><a href="'.esc_url($video).'" target="_blank" rel="noopener">ভিডিও দেখুন</a></p>';
+        echo '</article>';
+    }
+    echo '</div>';
+    wp_reset_postdata();
+    return ob_get_clean();
+}
+add_shortcode('tribune_gallery','tb_core_gallery_shortcode');
+
+/* সম্পাদকীয় দলের জন্য সীমিত ক্ষমতার আলাদা ভূমিকা */
+function tb_core_register_editorial_roles() {
+    add_role('tb_reporter','প্রতিবেদক',['read'=>true,'edit_posts'=>true,'publish_posts'=>false,'delete_posts'=>false,'upload_files'=>true]);
+    add_role('tb_sub_editor','সহ-সম্পাদক',['read'=>true,'edit_posts'=>true,'edit_others_posts'=>true,'publish_posts'=>true,'upload_files'=>true,'moderate_comments'=>true]);
+}
+add_action('init','tb_core_register_editorial_roles');
+
