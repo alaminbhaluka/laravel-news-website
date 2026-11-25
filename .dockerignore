@@ -1,0 +1,13 @@
+# Keep secrets, local dependencies, and the source SQL backup out of the image.
+.git
+.env
+.env.*
+!.env.example
+/vendor
+/node_modules
+/public/hot
+/storage/*.key
+/storage/logs/*
+/.phpunit.result.cache
+/news-website.sql
+/tests
