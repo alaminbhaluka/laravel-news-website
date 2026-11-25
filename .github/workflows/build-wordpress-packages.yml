@@ -1,4 +1,4 @@
-name: Build Tribune Bangla WordPress packages
+name: Build Tribune Bangla WordPress theme
 
 on:
   workflow_dispatch:
@@ -7,7 +7,6 @@ on:
       - wordpress-theme-foundation
     paths:
       - 'wp-content/themes/tribune-bangla/**'
-      - 'wp-content/plugins/tribune-bangla-core/**'
       - '.github/workflows/build-wordpress-packages.yml'
 
 permissions:
@@ -22,24 +21,22 @@ jobs:
         with:
           ref: wordpress-theme-foundation
 
-      - name: Build installable ZIP files
+      - name: Build theme ZIP
         shell: bash
         run: |
           set -euo pipefail
           test -f wp-content/themes/tribune-bangla/style.css
-          test -f wp-content/plugins/tribune-bangla-core/tribune-bangla-core.php
+          test -f wp-content/themes/tribune-bangla/functions.php
           mkdir -p dist
           cd wp-content/themes
           zip -qr ../../dist/tribune-bangla-theme.zip tribune-bangla
-          cd ../plugins
-          zip -qr ../../dist/tribune-bangla-core-plugin.zip tribune-bangla-core
           cd ../../
-          sha256sum dist/*.zip > dist/SHA256SUMS.txt
+          sha256sum dist/tribune-bangla-theme.zip > dist/SHA256SUMS.txt
 
-      - name: Upload installable packages
+      - name: Upload theme package
         uses: actions/upload-artifact@v4
         with:
-          name: tribune-bangla-wordpress-installers
+          name: tribune-bangla-theme
           path: dist/
           if-no-files-found: error
           retention-days: 30
