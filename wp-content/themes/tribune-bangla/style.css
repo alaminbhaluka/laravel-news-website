@@ -29,3 +29,16 @@ Text Domain: tribune-bangla
 .tb-gallery-card h3{font-size:1.05rem;line-height:1.5}
 @media(max-width:700px){.tb-account-forms{grid-template-columns:1fr}.tb-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.tb-gallery-grid{grid-template-columns:1fr}}
+
+
+/* Newsroom feature components */
+.tb-reporter-panel{margin:24px 0}
+.tb-contact-form label,.tb-account-forms label{display:block;font-weight:700}
+.tb-contact-form input,.tb-contact-form textarea,.tb-contact-form select,.tb-account-forms input{display:block;width:100%;margin-top:6px}
+.tb-newsletter-form input{flex:1;min-width:180px}
+.tb-newsletter-form button,.tb-contact-form button,.tb-account-forms button{min-height:44px}
+.tb-advertisements img{max-width:100%;height:auto}
+.tb-ad-header{margin:12px auto}
+.tb-ad-sidebar{margin:18px 0}
+.tb-gallery-grid{margin:20px 0}
+.tb-reporter-panel .tb-list{margin-top:10px}
