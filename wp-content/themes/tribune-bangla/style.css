@@ -42,3 +42,77 @@ Text Domain: tribune-bangla
 .tb-ad-sidebar{margin:18px 0}
 .tb-gallery-grid{margin:20px 0}
 .tb-reporter-panel .tb-list{margin-top:10px}
+
+
+/* Tribune Bangla refined newsroom layout */
+:root{--tb-max:1180px;--tb-red:#b5122a;--tb-soft:#f7f7f8}
+body{background:#f7f7f8;color:#202124}
+.tb-wrap{width:min(var(--tb-max),calc(100% - 40px))}
+.tb-top{font-size:12px}
+.tb-top .tb-wrap{min-height:34px;align-items:center}
+.tb-masthead{background:#fff;padding:20px 0}
+.tb-brand{min-height:76px;gap:18px;flex-wrap:wrap}
+.tb-brand-name{font-size:clamp(30px,4vw,44px);letter-spacing:-.8px}
+.tb-tagline{font-size:14px;border-left:1px solid #ddd;padding-left:16px}
+.tb-nav{box-shadow:0 2px 7px #00000012}
+.tb-nav .tb-wrap{min-height:48px}
+.tb-menu a{padding:13px 14px}
+.tb-search input{border:1px solid #e1e1e1;background:#fff}
+.tb-breaking{border:1px solid #eee;border-radius:4px;background:#fff;margin:18px auto;padding:9px 12px;min-height:48px}
+.tb-breaking>div{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tb-section{margin:30px auto}
+.tb-hero{gap:14px;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)}
+.tb-hero-main{min-height:390px;border-radius:5px}
+.tb-hero-side{grid-template-columns:1fr 1fr;gap:14px}
+.tb-hero-small{min-height:188px;border-radius:5px}
+.tb-hero img{opacity:.9}
+.tb-overlay{inset:20% 0 0;padding:22px}
+.tb-hero-main h1{font-size:clamp(23px,2.8vw,34px)}
+.tb-hero-small h2{font-size:16px}
+.tb-section-head{border-bottom:1px solid #d7d7d7;margin-bottom:18px}
+.tb-section-head h2{font-size:22px;padding:0 0 9px}
+.tb-grid{gap:22px 18px}
+.tb-card{background:#fff;border:1px solid #ededed;border-radius:5px;overflow:hidden;padding-bottom:12px;box-shadow:0 2px 8px #00000008}
+.tb-card>a{display:block}
+.tb-card .tb-thumb{aspect-ratio:16/10;background:#e9eaec}
+.tb-card .tb-thumb img{width:100%;height:100%;object-fit:cover}
+.tb-card .tb-cat{margin:10px 12px 0}
+.tb-card h3{font-size:16px;line-height:1.55;margin:6px 12px 8px;min-height:3.1em}
+.tb-card .tb-meta{display:block;margin:0 12px;color:#777}
+.tb-layout{gap:26px}
+.tb-sidebar section,.widget{background:#fff;border:1px solid #eee;border-radius:5px}
+.tb-footer{margin-top:50px;padding:42px 0 18px}
+.tb-footer-grid{gap:34px}
+.tb-footer h2{border-bottom:1px solid #ffffff25;padding-bottom:10px}
+.tb-social-links{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px}
+@media(max-width:850px){
+ .tb-wrap{width:calc(100% - 28px)}
+ .tb-hero{grid-template-columns:1fr}
+ .tb-hero-main{min-height:340px}
+ .tb-hero-side{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .tb-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px}
+ .tb-layout{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .tb-wrap{width:calc(100% - 22px)}
+ .tb-masthead{padding:12px 0}
+ .tb-brand{min-height:54px;gap:8px}
+ .tb-brand-name{font-size:28px}
+ .tb-tagline{display:none}
+ .tb-nav .tb-wrap{width:100%;padding:0 11px}
+ .tb-nav-inner{min-height:46px}
+ .tb-menu a{padding:10px 12px}
+ .tb-hero-main{min-height:285px}
+ .tb-hero-side{gap:9px}
+ .tb-hero-small{min-height:145px}
+ .tb-overlay{padding:10px}
+ .tb-hero-small h2{font-size:13px}
+ .tb-grid{gap:13px 10px}
+ .tb-card h3{font-size:14px;min-height:4.3em;margin:5px 9px}
+ .tb-card .tb-cat{margin:8px 9px 0}
+ .tb-card .tb-meta{margin:0 9px;font-size:11px}
+ .tb-section{margin:22px auto}
+ .tb-section-head h2{font-size:19px}
+ .tb-breaking{margin:12px auto}
+ .tb-footer{padding-top:30px}
+}
