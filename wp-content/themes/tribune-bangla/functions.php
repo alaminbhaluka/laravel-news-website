@@ -79,3 +79,5 @@ function tribune_bangla_social_customizer($wp_customize) {
     }
 }
 add_action('customize_register','tribune_bangla_social_customizer');
+
+require_once get_template_directory().'/inc/newsroom-features.php';
