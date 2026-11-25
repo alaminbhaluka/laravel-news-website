@@ -375,3 +375,8 @@ function tb_core_sync_role_caps() {
     if ($sub) foreach (['read','edit_posts','edit_others_posts','edit_published_posts','publish_posts','upload_files','moderate_comments'] as $cap) $sub->add_cap($cap);
 }
 add_action('init','tb_core_sync_role_caps',20);
+
+/* WP-CLI importer is loaded only in command-line context. */
+if (defined('WP_CLI') && WP_CLI && file_exists(__DIR__.'/includes/class-tb-legacy-importer.php')) {
+    require_once __DIR__.'/includes/class-tb-legacy-importer.php';
+}
