@@ -16,6 +16,7 @@ final class Tribune_Bangla_Core {
         add_action('personal_options_update', [$this, 'save_mobile_profile_field']);
         add_action('edit_user_profile_update', [$this, 'save_mobile_profile_field']);
         add_shortcode('tribune_newsletter', [$this, 'newsletter_form']);
+        add_shortcode('tribune_contact_form', [$this, 'contact_form']);
         add_action('admin_post_nopriv_tb_subscribe', [$this, 'subscribe']);
         add_action('admin_post_tb_subscribe', [$this, 'subscribe']);
         add_action('admin_post_nopriv_tb_contact', [$this, 'contact_submit']);
@@ -90,6 +91,18 @@ final class Tribune_Bangla_Core {
         }
         wp_safe_redirect(add_query_arg('subscribed', '1', wp_get_referer() ?: home_url('/')));
         exit;
+    }
+
+    public function contact_form() {
+        $action = esc_url(admin_url('admin-post.php'));
+        return '<form class="tb-contact-form" method="post" action="'.$action.'">
+            <input type="hidden" name="action" value="tb_contact">
+            '.wp_nonce_field('tb_contact', 'tb_contact_nonce', true, false).'
+            <p><label>আপনার নাম <input type="text" name="name" required></label></p>
+            <p><label>ইমেইল <input type="email" name="email"></label></p>
+            <p><label>বার্তা <textarea name="message" rows="6" required></textarea></label></p>
+            <button type="submit">বার্তা পাঠান</button>
+        </form>';
     }
 
     public function contact_submit() {
