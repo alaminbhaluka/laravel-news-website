@@ -68,3 +68,14 @@ function tribune_bangla_body_classes($classes) {
     return $classes;
 }
 add_filter('body_class', 'tribune_bangla_body_classes');
+
+/* সামাজিক যোগাযোগমাধ্যমের লিংক */
+function tribune_bangla_social_customizer($wp_customize) {
+    $wp_customize->add_section('tb_social_links',['title'=>__('সামাজিক যোগাযোগমাধ্যম','tribune-bangla'),'priority'=>36]);
+    foreach (['facebook'=>'ফেসবুক','youtube'=>'ইউটিউব','instagram'=>'ইনস্টাগ্রাম','x'=>'এক্স (টুইটার)'] as $key=>$label) {
+        $setting='tb_social_'.$key;
+        $wp_customize->add_setting($setting,['default'=>'','sanitize_callback'=>'esc_url_raw']);
+        $wp_customize->add_control($setting,['label'=>$label.' URL','section'=>'tb_social_links','type'=>'url']);
+    }
+}
+add_action('customize_register','tribune_bangla_social_customizer');
