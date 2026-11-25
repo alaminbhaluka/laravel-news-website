@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',function(){const nav=document.getElementById('tb-navigation');const btn=nav?.querySelector('.tb-mobile-toggle');btn?.addEventListener('click',function(){const open=nav.classList.toggle('is-open');btn.setAttribute('aria-expanded',open?'true':'false');});});
