@@ -1,0 +1,13 @@
+# Do not package secrets, local dependencies, or source database dumps.
+.git
+.env
+.env.*
+!.env.example
+/vendor
+/node_modules
+/public/hot
+/storage/*.key
+/storage/logs/*
+/.phpunit.result.cache
+/news-website.sql
+/tests
