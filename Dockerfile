@@ -12,9 +12,9 @@ FROM php:8.2-cli-bookworm AS app
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
-    libicu-dev unzip git ca-certificates \
+    libicu-dev libonig-dev libcurl4-openssl-dev unzip git ca-certificates \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" pdo_pgsql pgsql bcmath gd intl zip exif pcntl opcache \
+    && docker-php-ext-install -j"$(nproc)" pdo_pgsql pgsql bcmath gd intl zip exif mbstring curl pcntl opcache \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
