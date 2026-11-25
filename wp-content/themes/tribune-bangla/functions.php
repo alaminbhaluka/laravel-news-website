@@ -13,8 +13,9 @@ function tribune_bangla_setup() {
 }
 add_action('after_setup_theme','tribune_bangla_setup');
 function tribune_bangla_assets() {
-    wp_enqueue_style('tribune-bangla-style', get_stylesheet_uri(), [], '1.0.0');
-    wp_enqueue_script('tribune-bangla-script', get_template_directory_uri().'/assets/js/theme.js', [], '1.0.0', true);
+    wp_enqueue_style('tribune-bangla-style', get_stylesheet_uri(), [], (string) filemtime(get_stylesheet_directory().'/style.css'));
+    $script_file = get_template_directory().'/assets/js/theme.js';
+    wp_enqueue_script('tribune-bangla-script', get_template_directory_uri().'/assets/js/theme.js', [], file_exists($script_file) ? (string) filemtime($script_file) : '1.0.1', true);
 }
 add_action('wp_enqueue_scripts','tribune_bangla_assets');
 function tribune_bangla_widgets() {
@@ -84,3 +85,16 @@ require_once get_template_directory().'/inc/newsroom-features.php';
 
 require_once get_template_directory().'/inc/analytics-newsletter-seo.php';
 add_action('after_switch_theme', 'flush_rewrite_rules');
+
+
+/* Additional visible Customizer controls */
+function tribune_bangla_extended_customizer($wp_customize) {
+    $wp_customize->add_section('tb_header_footer_options', ['title'=>__('হেডার ও ফুটার সেটিংস','tribune-bangla'),'priority'=>34,'description'=>__('হেডার, তারিখ বার এবং ফুটারের লেখা নিয়ন্ত্রণ করুন।','tribune-bangla')]);
+    $wp_customize->add_setting('tb_tagline_text', ['default'=>'সত্যের সন্ধানে, পাঠকের পাশে','sanitize_callback'=>'sanitize_text_field']);
+    $wp_customize->add_control('tb_tagline_text', ['label'=>__('লোগোর পাশে পরিচিতি','tribune-bangla'),'section'=>'tb_header_footer_options','type'=>'text']);
+    $wp_customize->add_setting('tb_show_topbar', ['default'=>1,'sanitize_callback'=>'absint']);
+    $wp_customize->add_control('tb_show_topbar', ['label'=>__('উপরের তারিখ বার দেখান','tribune-bangla'),'section'=>'tb_header_footer_options','type'=>'checkbox']);
+    $wp_customize->add_setting('tb_home_category_count', ['default'=>8,'sanitize_callback'=>function($v){return max(1,min(12,absint($v)));}]);
+    $wp_customize->add_control('tb_home_category_count', ['label'=>__('হোমপেজে বিভাগের সংখ্যা (১–১২)','tribune-bangla'),'section'=>'tb_header_footer_options','type'=>'number','input_attrs'=>['min'=>1,'max'=>12]]);
+}
+add_action('customize_register', 'tribune_bangla_extended_customizer', 20);
