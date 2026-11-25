@@ -7,6 +7,8 @@ function tribune_bangla_setup() {
     add_theme_support('html5', ['search-form','comment-form','comment-list','gallery','caption','style','script']);
     add_theme_support('custom-logo', ['height'=>90,'width'=>360,'flex-height'=>true,'flex-width'=>true]);
     add_theme_support('custom-background');
+    add_image_size('tb-featured', 900, 600, true);
+    add_image_size('tb-card', 480, 320, true);
     register_nav_menus(['primary'=>__('প্রধান মেনু','tribune-bangla'),'footer'=>__('ফুটার মেনু','tribune-bangla')]);
 }
 add_action('after_setup_theme','tribune_bangla_setup');
@@ -35,3 +37,34 @@ function tribune_bangla_customizer($wp_customize){
     $wp_customize->add_control('tb_footer_text',['label'=>__('ফুটার পরিচিতি','tribune-bangla'),'section'=>'tb_news_options','type'=>'text']);
 }
 add_action('customize_register','tribune_bangla_customizer');
+
+
+/* সম্পাদকীয় নিয়ন্ত্রণ: ব্রেকিং নিউজ */
+function tribune_bangla_add_breaking_metabox() {
+    add_meta_box('tb-breaking-news', __('সংবাদটি ব্রেকিং নিউজ হিসেবে দেখান','tribune-bangla'), 'tribune_bangla_breaking_metabox_html', 'post', 'side', 'high');
+}
+add_action('add_meta_boxes', 'tribune_bangla_add_breaking_metabox');
+function tribune_bangla_breaking_metabox_html($post) {
+    wp_nonce_field('tb_save_breaking_news', 'tb_breaking_nonce');
+    $checked = get_post_meta($post->ID, '_tb_breaking', true) === '1';
+    echo '<label><input type="checkbox" name="tb_breaking" value="1" '.checked($checked, true, false).' /> '.esc_html__('হোমপেজের ব্রেকিং নিউজ বারে দেখান','tribune-bangla').'</label>';
+}
+function tribune_bangla_save_breaking_metabox($post_id) {
+    if (!isset($_POST['tb_breaking_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['tb_breaking_nonce'])), 'tb_save_breaking_news')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    if (isset($_POST['tb_breaking']) && $_POST['tb_breaking'] === '1') {
+        update_post_meta($post_id, '_tb_breaking', '1');
+    } else {
+        delete_post_meta($post_id, '_tb_breaking');
+    }
+}
+add_action('save_post_post', 'tribune_bangla_save_breaking_metabox');
+
+/* বাংলা তারিখ ও সময় প্রদর্শনের জন্য সাইট লোকেল অনুসরণ */
+function tribune_bangla_body_classes($classes) {
+    $classes[] = 'tb-theme';
+    if (is_front_page()) $classes[] = 'tb-home';
+    return $classes;
+}
+add_filter('body_class', 'tribune_bangla_body_classes');
